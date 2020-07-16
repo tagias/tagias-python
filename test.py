@@ -1,23 +1,6 @@
-# tagias-python
-
-Public python module for tagias.com external API
-
-## Installation
-
-`pip install https://github.com/tagias/tagias-python.git`
-
-## Documentation
-You can find the detailed documentation for our external REST API at the [API Reference](https://tagias.com/docs) page
-
-## Usage
-
-This helper module was designed to simplify the way you are using the tagias.com external API
-
-```python
 # import the tagias api helper classes
 import tagias
 
-# Replace the test API key with your own private API key
 apiKey = 'test'
 
 # Testing the TAGIAS external API methods
@@ -78,4 +61,3 @@ try:
 except tagias.TagiasError as e:
     # handle a TagiasError exception
     print('TagiasError: {} ({})'.format(e.message, e.code))
-```
