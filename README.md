@@ -4,7 +4,9 @@ Public python module for tagias.com external API
 
 ## Installation
 
-`pip install https://github.com/tagias/tagias-python.git`
+`pip install git+https://github.com/tagias/tagias-python.git`
+or
+`python -m pip install git+https://github.com/tagias/tagias-python.git`
 
 ## Documentation
 You can find the detailed documentation for our external REST API at the [API Reference](https://tagias.com/docs) page
