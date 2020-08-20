@@ -1,6 +1,7 @@
 # import the tagias api helper classes
-import tagias
+from tagias.tagias import TagiasHelper, TagiasError, TagiasTypes, TagiasStatuses
 
+# Replace the test API key with your own private API key
 apiKey = 'test'
 
 # Testing the TAGIAS external API methods
@@ -8,19 +9,19 @@ try:
     print('Test Start')
 
     # create tagias helper object
-    helper = tagias.TagiasHelper(apiKey)
+    helper = TagiasHelper(apiKey)
 
     # create a new package
-    newPackage = helper.create_package('Test package', tagias.TagiasTypes.Keypoints,
+    newPackage = helper.create_package('Test package', TagiasTypes.Keypoints,
       'Put one point only in the center of the image', None, None,
-      'https:#p.tagias.com/samples/', ['dog.8001.jpg', 'dog.8002.jpg', 'dog.8003.jpg'])
+      'https://p.tagias.com/samples/', ['dog.8001.jpg', 'dog.8002.jpg', 'dog.8003.jpg'])
     
     print('Package {} was created with {} image(s)'.format(newPackage['id'], newPackage['pictures_num']))
 
     try:
         # modify the package's status
-        helper.set_package_status(newPackage['id'], tagias.TagiasStatuses.STOPPED)
-    except tagias.TagiasError as e:
+        helper.set_package_status(newPackage['id'], TagiasStatuses.STOPPED)
+    except TagiasError as e:
         # handle a TagiasError exception
         print('{} package\'s status was NOT modified: {}'.format(newPackage['id'], e.message))
 
@@ -38,7 +39,7 @@ try:
     print('Packages:')
     for package in packages:
         print(' * {} {} {} {}'.format(package['id'], package['name'], package['status'], package['created']))
-        if package['status']==tagias.TagiasStatuses.FINISHED:
+        if package['status']==TagiasStatuses.FINISHED:
             # get the package's result if it's already finished
             result = helper.get_result(package['id'])
             print(result)
@@ -46,7 +47,7 @@ try:
             try:
                 # request the package's result to be send to the callback endpoint
                 helper.request_result(package['id'])
-            except tagias.TagiasError as e:
+            except TagiasError as e:
                 # handle a TagiasError exception
                 print('{} package\'s result was NOT requested: {}'.format(package['id'], e.message))
 
@@ -58,6 +59,6 @@ try:
         print(' * {}: {} USD, {}'.format(op['date'], op['amount'], op['note']))
 
     print('Test End')
-except tagias.TagiasError as e:
+except TagiasError as e:
     # handle a TagiasError exception
     print('TagiasError: {} ({})'.format(e.message, e.code))
