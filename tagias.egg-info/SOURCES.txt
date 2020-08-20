@@ -1,0 +1,9 @@
+README.md
+setup.py
+tagias/__init__.py
+tagias/tagias.py
+tagias.egg-info/PKG-INFO
+tagias.egg-info/SOURCES.txt
+tagias.egg-info/dependency_links.txt
+tagias.egg-info/requires.txt
+tagias.egg-info/top_level.txt
