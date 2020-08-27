@@ -13,9 +13,14 @@ or
 ## Documentation
 You can find the detailed documentation for our external REST API at the [API Reference](https://tagias.com/docs) page
 
+## Source code
+You can find the source code on its GitHub page https://github.com/tagias/tagias-python.git
+
 ## Usage
 
 This helper module was designed to simplify the way you are using the tagias.com external API
+
+You can use the **TagiasHelper** class to get responses as JSON objects.
 
 ```python
 # import the tagias api helper classes
@@ -24,7 +29,7 @@ from tagias.tagias import TagiasHelper, TagiasError, TagiasTypes, TagiasStatuses
 # Replace the test API key with your own private API key
 apiKey = 'test'
 
-# Testing the TAGIAS external API methods
+# Testing the TAGIAS external API methods using TagiasHelper class
 try:
     print('Test Start')
 
@@ -76,6 +81,81 @@ try:
         print(' * {}: {} USD, {}'.format(op['date'], op['amount'], op['note']))
 
     print('Test End')
+except TagiasError as e:
+    # handle a TagiasError exception
+    print('TagiasError: {} ({})'.format(e.message, e.code))
+```
+
+Or you can use the **TagiasHelper2** class to get responses as class instances with all needed attributes.
+
+The **TagiasPackage, TagiasNewPackage, TagiasFullPackage, TagiasResult, TagiasBalance, TagiasOperation** classes are defined to hold the response information converted to objects with attributes.
+
+The **TagiasResult** class contains the *pictures* list of **TagiasPictureResult** class instances. 
+
+And the **TagiasPictureResult** class contains either the *datalist* attribute (a list of **TagiasBoundingBox**, **TagiasLine**, **TagiasPoligon**, **TagiasKeypoint** classes instances) or the *data* attribute (an instance of **TagiasClassificationSingle** or **TagiasClassificationMultiple** class).
+
+There is also the *result* attribute of the **TagiasPictureResult** class that contains JSON object with annotation results.
+
+```python
+# import the tagias api helper classes using TagiasHelper2 class
+from tagias.tagias import TagiasHelper2, TagiasError, TagiasTypes, TagiasStatuses
+
+# Replace the test API key with your own private API key
+apiKey = 'test'
+
+# Testing the TAGIAS external API methods
+try:
+    print('Test2 Start')
+
+    # create tagias helper object
+    helper = TagiasHelper2(apiKey)
+
+    # create a new package
+    newPackage = helper.create_package('Test package', TagiasTypes.Keypoints,
+        'Put one point only in the center of the image', None, None,
+        'https://p.tagias.com/samples/', ['dog.8001.jpg', 'dog.8002.jpg', 'dog.8003.jpg'])
+
+    print('Package {} was created with {} image(s)'.format(newPackage.id, newPackage.pictures_num))
+
+    try:
+        # modify the package's status
+        helper.set_package_status(newPackage.id, TagiasStatuses.STOPPED)
+    except TagiasError as e:
+        # handle a TagiasError exception
+        print('{} package\'s status was NOT modified: {}'.format(newPackage.id, e.message))
+
+    # get the package's properties
+    package = helper.get_package(newPackage.id)
+    print('New package properties:')
+    for prop in dir(package):
+        if not prop.startswith('_'):
+            print(' * {}: {}'.format(prop, getattr(package, prop)))
+
+    # get the list of all your packages
+    packages = helper.get_packages()
+    print('Packages:')
+    for package in packages:
+        print(' * {} {} {} {}'.format(package.id, package.name, package.status, package.created))
+        if package.status == TagiasStatuses.FINISHED:
+            # get the package's result if it's already finished
+            result = helper.get_result(package.id)
+            print(result)
+
+            try:
+                # request the package's result to be send to the callback endpoint
+                helper.request_result(package.id)
+            except TagiasError as e:
+                # handle a TagiasError exception
+                print('{} package\'s result was NOT requested: {}'.format(package.id, e.message))
+
+    # get current balance and financial operations
+    balance = helper.get_balance()
+    print('Current balance: {} USD'.format(balance.balance))
+    print('Operations:')
+    for op in balance.operations:
+        print(' * {}: {} USD, {}'.format(op.date, op.amount, op.note))
+
+    print('Test2 End')
 except TagiasError as e:
     # handle a TagiasError exception
     print('TagiasError: {} ({})'.format(e.message, e.code))
