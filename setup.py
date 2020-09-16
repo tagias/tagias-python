@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tagias",
-    version="1.1.0",
+    version="1.2.0",
     author="Vladimir Kryazh",
     author_email="vladimir@tagias.com",
     license="MIT License",

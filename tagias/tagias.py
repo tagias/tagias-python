@@ -24,6 +24,7 @@ class TagiasStatuses:
 class TagiasErrors:
     NONAME = 'NONAME'
     NOPICTURES = 'NOPICTURES'
+    BADPICTURES = 'BADPICTURES'
     NOLABELS = 'NOLABELS'
     BADCALLBACK = 'BADCALLBACK'
     BADBASEURL = 'BADBASEURL'
@@ -50,6 +51,8 @@ class TagiasError(Exception):
             return 'The package name is missing'
         elif code == TagiasErrors.NOPICTURES:
             return 'The pictures array is empty or missing'
+        elif code == TagiasErrors.BADPICTURES:
+            return 'Some of the provided pictures could not be accessed or their URLs are malformed'
         elif code == TagiasErrors.NOLABELS:
             return 'The labels array for the classification task is missing (or there are less than 2 items in the array)'
         elif code == TagiasErrors.BADCALLBACK:
@@ -77,7 +80,7 @@ class TagiasError(Exception):
 # TAGIAS helper class
 class TagiasHelper:
     # URL for the TAGIAS external API endpoint
-    _TAGIAS_URL = 'https://p.tagias.com/api/v1/tagias'
+    _TAGIAS_URL = 'https://p.tagias.com/api/v2/tagias'
 
     # Saves the provided API key for using it in subsequent method calls
     def __init__(self, apiKey):
@@ -124,7 +127,7 @@ class TagiasHelper:
         return packages
 
     # Creates a new TAGIAS package for annotation
-    def create_package(self, name, type, descr, labels, callback, baseurl, pictures):
+    def create_package(self, name, type, descr, labels, callback, baseurl, pictures, labels_required = None):
         data = {
             'name': name,
             'type': type,
@@ -132,7 +135,8 @@ class TagiasHelper:
             'labels': labels,
             'callback': callback,
             'baseurl': baseurl,
-            'pictures': pictures
+            'pictures': pictures,
+            'labels_required': labels_required
         }
         resp = requests.post(self._TAGIAS_URL + '/packages', json=data, headers=self.headers)
         json = self._handle_response(resp)
@@ -210,6 +214,7 @@ class TagiasFullPackage:
         self.status = package.get('status')
         self.descr = package.get('descr')
         self.labels = package.get('labels')
+        self.labels_required = package.get('labels_required')
         self.callback = package.get('callback')
         self.created = package.get('created')
         self.started = package.get('started')
